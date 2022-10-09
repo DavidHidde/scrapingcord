@@ -1,7 +1,0 @@
-version: "3.8"
-
-services:
-  scrapingcord:
-    container_name: scrapingcord
-    build: .
-    restart: always

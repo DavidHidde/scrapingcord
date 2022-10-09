@@ -1,14 +1,17 @@
 # ScraPingCord
-A simple combination framework of a Scrapy webscraper + a simple Discord ping bot in Python 3.10.
+A simple implementation of a Scrapy webscraper + a simple Discord ping bot in Python 3.10.
 
 This framework serves a very simple purpose: scrape content off the internet, use this to generate messages and publish these messages to recipients using Discord. This includes the following features:
-* Containerized operation to allow for high up-time
-* Abstract framework to allow custom spiders, message templating and message recipients
+* Easy implementation: only elements that actually differ between implementations have to be written
 * Use of the popular frameworks [discord.py](https://github.com/Rapptz/discord.py) and [Scrapy](https://scrapy.org/)
+* Easy integration into existing Scrapy or Discord.py setups by being able to pass settings/instances
 
-The main application of this is to generate multi-platform notifications for free.
+The main application of this is to generate Discord notifications based on web content, like custom webhooks.
 
-Requirements:
-* Docker with compose
-* A Discord bot setup with a token and the correct permissions for your needs
-* Implementations of the `MessageSpider` and the `MessagePipeline` to implement the scraping and message templating respectively.
+Implementation requirements are encapsulated by the `ScrapingImplentation` class:
+* A message template (with recipients) (see `MessageTemplate`)
+* A parser function that follows [Scrapy standards](https://docs.scrapy.org/en/latest/topics/spiders.html#scrapy.Spider.parse)
+* A set of starting urls
+
+## Limitations
+Currently, dynamic message templates based on scraped content are not supported.
