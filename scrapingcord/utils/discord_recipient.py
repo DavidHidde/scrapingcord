@@ -5,12 +5,12 @@ class DiscordRecipient:
     TYPE_USER = 'user'
     TYPE_CHANNEL = 'channel'
 
-    recipient_id: int
+    recipient_id: str
     recipient_type: str
 
     def __init__(
             self,
-            recipient_id: int, recipient_type: str
+            recipient_id: str, recipient_type: str
     ) -> None:
         """
         :param recipient_id: Unique ID of the user/channel/thread
@@ -19,8 +19,14 @@ class DiscordRecipient:
         self.recipient_id = recipient_id
         self.recipient_type = recipient_type
 
-    def get_unique_key(self) -> str:
+    def is_user(self) -> bool:
         """
-        :return: A unique key based on the type and id of the recipient
+        :return: True if this recipient is a user, else False
         """
-        return f"{self.recipient_type}_{self.recipient_id}"
+        return self.recipient_type == self.TYPE_USER
+
+    def is_channel(self) -> bool:
+        """
+        :return: True if this recipient is a channel, else False
+        """
+        return self.recipient_type == self.TYPE_CHANNEL

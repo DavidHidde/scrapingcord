@@ -1,44 +1,42 @@
-import functools
-from typing import Generator, Callable, Union, Iterable
+from typing import Generator
 
-from discord import Client
 from scrapy import Spider, Request
 from scrapy.http import Response
 
-from scrapingcord.scraper.template_item import TemplateItem
-from scrapingcord.utils import ScrapingImplementation, MessageTemplate
+from scrapingcord.discord import MessageSender
+from scrapingcord.utils import ScrapingImplementation
 
 
 class TemplateSpider(Spider):
     """
-    Spider that crawls based on the given template
+    Spider that crawls based on the given template.
+    This spider has none of the important logic, since it is located in the pipeline and middleware
     """
     name: str = 'template_spider'
-    client: Client
+    message_sender: MessageSender
     __mapping: dict
 
-    def __init__(self, mapping: dict, client: Client):
+    def __init__(self, mapping: dict, message_sender: MessageSender):
         """
         :param mapping: Mapping created in the PingScraper
+        :param message_sender: The message sender that should be used to send messages
         """
         self.__mapping = mapping
-        self.client = client
+        self.message_sender = message_sender
 
     def start_requests(self) -> Generator[Request, None, None]:
         """
         Start making requests with the specified callbacks based on the mapping
         """
-        for implementation_dict in self.__mapping:
+        for implementation_dict in self.__mapping.values():
             for url in implementation_dict.get(ScrapingImplementation.KEY_URLS, []):
                 yield Request(
                     url,
-                    self.__parse_decorator(
-                        implementation_dict.get(ScrapingImplementation.KEY_PARSER, self.parse),
-                        implementation_dict.get(ScrapingImplementation.KEY_TEMPLATE)
-                    )
+                    implementation_dict.get(ScrapingImplementation.KEY_PARSER, self.parse),
+                    meta=implementation_dict
                 )
 
-    def parse(self, response, **kwargs) -> None:
+    def parse(self, response: Response, **kwargs) -> None:
         """
         Standard empty parsing function to catch implementations with missing parsing functions
 
@@ -47,21 +45,3 @@ class TemplateSpider(Spider):
         :return:
         """
         pass
-
-    def __parse_decorator(
-            self,
-            parsing_func: Callable[[Response], Union[Iterable[Request], dict]],
-            message_template: MessageTemplate
-    ):
-        """
-        Decorator for combining a dict response and a message template into a TemplateItem
-
-        :param parsing_func: Function used for parsing Scrapy responses. Should follow https://docs.scrapy.org/en/latest/topics/spiders.html#scrapy.Spider.parse but return a dict for the final result
-        :param message_template: The message template that applies to this implementation
-        """
-        @functools.wraps(parsing_func)
-        def combine_item_response(*args, **kwargs):
-            response = parsing_func(*args, **kwargs)
-            return TemplateItem(template=message_template, template_data=response) if type(response) == dict else response
-
-        return combine_item_response

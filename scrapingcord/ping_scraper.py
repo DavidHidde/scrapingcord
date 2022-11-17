@@ -1,10 +1,11 @@
+import asyncio
 from typing import Optional, Callable, Iterable, Union
 
-from discord import Client, Intents
 from scrapy import Request
 from scrapy.crawler import CrawlerProcess
 from scrapy.http import Response
 
+from scrapingcord.discord import MessageSender
 from scrapingcord.scraper import TemplateSpider
 from scrapingcord.utils import ScrapingImplementation, MessageTemplate
 
@@ -17,11 +18,14 @@ class PingScraper:
 
     SCRAPER_SETTINGS = {
         'BOT_NAME': 'scrapingcord',
-        'LOG_LEVEL': 'INFO',
         'USER_AGENT': 'scrapingcord',
         'ROBOTSTXT_OBEY': True,
+        'LOG_LEVEL': 'WARNING',
         'ITEM_PIPELINES': {
             'scrapingcord.scraper.PingPipeline': 300,
+        },
+        'SPIDER_MIDDLEWARES': {
+            'scrapingcord.scraper.ImplementationMapperMiddleware': 543,
         },
         'TWISTED_REACTOR': 'twisted.internet.asyncioreactor.AsyncioSelectorReactor'
     }
@@ -79,34 +83,20 @@ class PingScraper:
         return self
 
     def run(
-        self,
-        settings: Optional[dict] = None,
-        token: Optional[str] = None,
-        client: Optional[Client] = None
+            self,
+            message_sender: MessageSender,
+            settings: Optional[dict] = None
     ) -> None:
         """
         Runs the scraper with the registered implementations.
-        If no discord client is given or can be initiated, an error will be thrown.
+        Can't be run inside a asyncio loop and also ends with a asyncio loop.
 
+        :param message_sender: The message sender that should be used to send messages
         :param settings: Scrapy settings dictionary. Uses default settings if not given
-        :param token: The Discord bot token. Nullable if the client is set
-        :param client: The Discord bot client. Nullable if the token is set
         """
-        process = CrawlerProcess(settings=(settings if settings is not None else self.SCRAPER_SETTINGS))
-        process.crawl(TemplateSpider(self.__mapping, client if client is not None else self.get_client(token)))
+        settings = settings if settings is not None else self.SCRAPER_SETTINGS
+
+        process = CrawlerProcess(settings=settings)
+        process.crawl(TemplateSpider, mapping=self.__mapping, message_sender=message_sender)
         process.start()
-
-    def get_client(self, token: str) -> Client:
-        """
-        Try to get a Discord client with default intents based on the
-
-        :param token: The Discord bot token
-        :return: A default Discord Client
-        """
-        if token is None:
-            raise Exception('Discord client nor token provided')
-
-        intents = Intents.default()
-        intents.message_content = True
-
-        return Client(intents=intents)
+        asyncio.run(message_sender.flush())
