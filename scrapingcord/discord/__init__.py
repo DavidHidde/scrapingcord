@@ -1,5 +1,5 @@
 from scrapingcord.discord.discord_http_client import DiscordHttpClient
-from scrapingcord.discord.message_sender import MessageSender
 from scrapingcord.discord.direct_discord_message_sender import DirectDiscordMessageSender
 from scrapingcord.discord.buffered_discord_message_sender import BufferedDiscordMessageSender
 from scrapingcord.discord.discord_message_sender import DiscordMessageSender
+from scrapingcord.discord.discord_recipient_type import DiscordRecipientType

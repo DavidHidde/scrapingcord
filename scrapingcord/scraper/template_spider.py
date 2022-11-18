@@ -3,7 +3,7 @@ from typing import Generator
 from scrapy import Spider, Request
 from scrapy.http import Response
 
-from scrapingcord.discord import MessageSender
+from scrapingcord.utils import MessageSender
 from scrapingcord.utils import ScrapingImplementation
 
 

@@ -1,6 +1,42 @@
+import functools
+import logging
+from asyncio import sleep, Lock
 from typing import Union
 
 from aiohttp import ClientSession
+
+
+def rate_limit(api_call_func):
+    """
+    Decorator for rate-limiting Discord API calls
+    """
+
+    @functools.wraps(api_call_func)
+    async def retry_on_rate_limit(*args, **kwargs):
+        async with DiscordHttpClient.lock:
+            response = await api_call_func(*args, **kwargs)
+            if response.get('retry_after') is not None:
+                await sleep(float(response.get('retry_after')))
+                response = await api_call_func(*args, **kwargs)
+
+            return response
+
+    return retry_on_rate_limit
+
+
+def log_api_errors(api_call_func):
+    """
+    Log errors if they are present in the API response
+    """
+
+    @functools.wraps(api_call_func)
+    async def log_errors_in_response(*args, **kwargs):
+        response = await api_call_func(*args, **kwargs)
+        if response.get('errors'):
+            logging.getLogger('DiscordHttpClient').warning('Encountered error in API response: ' + str(response))
+        return response
+
+    return log_errors_in_response
 
 
 class DiscordHttpClient:
@@ -12,6 +48,9 @@ class DiscordHttpClient:
 
     __token: str
     __session: Union[ClientSession, None] = None
+
+    # Lock to avoid problems when we are being rate limited
+    lock = Lock()
 
     def __init__(self, token: str):
         """
@@ -30,6 +69,8 @@ class DiscordHttpClient:
         """
         return '/'.join([self.DISCORD_API_BASE_URL, self.API_VERSION, api_route])
 
+    @log_api_errors
+    @rate_limit
     async def create_dm(self, recipient_id: str) -> dict:
         """
         Create a DM channel with a specific User
@@ -39,11 +80,13 @@ class DiscordHttpClient:
         :return: A DM Channel object https://discord.com/developers/docs/resources/channel#channel-object
         """
         async with self.get_session().post(
-            self.create_api_url('users/@me/channels'),
-            json={'recipient_id': recipient_id}
+                self.create_api_url('users/@me/channels'),
+                json={'recipient_id': recipient_id}
         ) as response:
             return await response.json()
 
+    @log_api_errors
+    @rate_limit
     async def create_message(self, channel_id: str, message_contents: dict) -> dict:
         """
         Send a message to a specific channel
@@ -54,11 +97,10 @@ class DiscordHttpClient:
         :return:
         """
         async with self.get_session().post(
-            self.create_api_url(f"channels/{channel_id}/messages"),
-            json=message_contents
+                self.create_api_url(f"channels/{channel_id}/messages"),
+                json=message_contents
         ) as response:
             return await response.json()
-
 
     def get_session(self) -> ClientSession:
         """

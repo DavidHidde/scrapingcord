@@ -1,6 +1,6 @@
 from typing import Union
 
-from scrapingcord.utils.discord_recipient import DiscordRecipient
+from scrapingcord.utils.recipient import Recipient
 
 
 class MessageTemplate:
@@ -8,9 +8,9 @@ class MessageTemplate:
     A message template consisting of a formattable string and the recipients
     """
     __formattable_message: str
-    __recipients: list[DiscordRecipient]
+    __recipients: list[Recipient]
 
-    def __init__(self, message_template: str, recipients: list[DiscordRecipient]) -> None:
+    def __init__(self, message_template: str, recipients: list[Recipient]) -> None:
         """
         :param message_template: A formattable string, e.g.:
             'My template message for my favourite users {name} and {second_name}' -> {name: Monthy, second_name: Python}
@@ -21,7 +21,7 @@ class MessageTemplate:
         self.__formattable_message = message_template
         self.__recipients = recipients
 
-    def get_message_list(self, message_args: Union[list, dict]) -> list[tuple[str, DiscordRecipient]]:
+    def get_message_list(self, message_args: Union[list, dict]) -> list[tuple[str, Recipient]]:
         """
         Returns a list of the messages that should be sent to which recipient
 

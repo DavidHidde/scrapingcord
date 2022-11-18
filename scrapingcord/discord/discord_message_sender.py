@@ -1,9 +1,10 @@
 from abc import ABC
 from typing import Optional
 
-from scrapingcord.discord import DiscordHttpClient
-from scrapingcord.discord.message_sender import MessageSender
-from scrapingcord.utils import DiscordRecipient
+from scrapingcord.discord.discord_recipient_type import DiscordRecipientType
+from scrapingcord.discord.discord_http_client import DiscordHttpClient
+from scrapingcord.utils.message_sender import MessageSender
+from scrapingcord.utils import Recipient
 
 
 class DiscordMessageSender(MessageSender, ABC):
@@ -26,7 +27,7 @@ class DiscordMessageSender(MessageSender, ABC):
         """
         await self.__client.close()
 
-    async def send_message(self, recipient: DiscordRecipient, message_contents: dict) -> bool:
+    async def send_message(self, recipient: Recipient, message_contents: dict) -> bool:
         """
         Send the message to the recipient. Make a DM channel first if the recipient is a user.
 
@@ -35,7 +36,7 @@ class DiscordMessageSender(MessageSender, ABC):
         :return: True if sending the message went well, if there were errors return False
         """
         channel_id = recipient.recipient_id
-        if recipient.is_user():
+        if recipient.recipient_type == DiscordRecipientType.TYPE_USER:
             channel_id = await self.get_user_dm_channel(recipient.recipient_id)
 
         return channel_id is not None and (await self.__client.create_message(channel_id, message_contents)).get('id') is not None

@@ -5,9 +5,8 @@ from scrapy import Request
 from scrapy.crawler import CrawlerProcess
 from scrapy.http import Response
 
-from scrapingcord.discord import MessageSender
 from scrapingcord.scraper import TemplateSpider
-from scrapingcord.utils import ScrapingImplementation, MessageTemplate
+from scrapingcord.utils import ScrapingImplementation, MessageTemplate, MessageSender
 
 
 class PingScraper:
@@ -27,7 +26,8 @@ class PingScraper:
         'SPIDER_MIDDLEWARES': {
             'scrapingcord.scraper.ImplementationMapperMiddleware': 543,
         },
-        'TWISTED_REACTOR': 'twisted.internet.asyncioreactor.AsyncioSelectorReactor'
+        'TWISTED_REACTOR': 'twisted.internet.asyncioreactor.AsyncioSelectorReactor',
+        'REQUEST_FINGERPRINTER_IMPLEMENTATION': '2.7'
     }
 
     def register_implementation(self, implementation: ScrapingImplementation):

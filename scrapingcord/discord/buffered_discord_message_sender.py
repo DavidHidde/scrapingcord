@@ -1,5 +1,3 @@
-from typing import Optional
-
 from scrapingcord.discord.discord_message_sender import DiscordMessageSender
 from scrapingcord.utils import MessageTemplate
 

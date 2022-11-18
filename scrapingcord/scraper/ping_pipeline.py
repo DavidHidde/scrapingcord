@@ -2,7 +2,7 @@
 from typing import Optional
 from scrapy.exceptions import DropItem
 
-from scrapingcord.discord import MessageSender
+from scrapingcord.utils import MessageSender
 from scrapingcord.scraper.template_item import TemplateItem
 from scrapingcord.scraper.template_spider import TemplateSpider
 

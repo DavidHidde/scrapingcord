@@ -38,4 +38,4 @@ service = PingScraper()
 service.register_implementation(implementation)
 service.run(BufferedDiscordMessageSender(DISCORD_TOKEN))
 ```
-This implementation uses the `BufferedDiscordMessageSender`, which concatenates all messages for a recipient into a single message. The `DirectDiscordMessageSender` can also be used to send all messages individually, but this sender should be avoided due to rate-limiting. Custom senders can be made using the `DiscordMessageSender`.
+This implementation uses the `BufferedDiscordMessageSender`, which concatenates all messages for a recipient into a single message. This can however turn into a problem if the message becomes too long. The `DirectDiscordMessageSender` can also be used to send all messages individually. Custom senders can be made using the `DiscordMessageSender`.
