@@ -111,7 +111,7 @@ class DiscordHttpClient:
         if self.__session is None:
             headers = {
                 'Authorization': 'Bot ' + self.__token,
-                'User-Agent': 'ScraPingCord (https://github.com/DavidHidde/scrapingcord, 0.1)'
+                'User-Agent': 'ScraPingCord (https://github.com/DavidHidde/scrapingcord, 1.0)'
             }
             self.__session = ClientSession(headers=headers)
 
