@@ -4,13 +4,14 @@ from scrapingcord.utils import MessageTemplate
 
 class BufferedDiscordMessageSender(DiscordMessageSender):
     """
-    A Discord message sender which sends all messages in a single message at when closed
+    A Discord message sender which sends all messages in a single message when it closes.
+    Note that Discord has a content limit and no message will be sent if it errors out.
     """
     __messages_buffer: dict = {}
 
     async def add_message(self, template: MessageTemplate, template_data: dict) -> bool:
         """
-        Send the message to the recipient. Make a DM channel first if the recipient is a user.
+        Add the message to the buffer per recipient
 
         :param template: The message template to send
         :param template_data: The data to substitute in the template
@@ -28,7 +29,7 @@ class BufferedDiscordMessageSender(DiscordMessageSender):
 
     async def flush(self) -> None:
         """
-        Close the client since we've sent everything already
+        Send all messages and close the client
         """
         for recipient_dict in self.__messages_buffer.values():
             await self.send_message(

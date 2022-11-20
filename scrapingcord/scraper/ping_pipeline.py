@@ -9,7 +9,7 @@ from scrapingcord.scraper.template_spider import TemplateSpider
 
 class PingPipeline:
     """
-    Pipeline that pings using Discord based on the given template
+    Pipeline that sends a message using the MessageSender
     """
     __message_sender: Optional[MessageSender]
 

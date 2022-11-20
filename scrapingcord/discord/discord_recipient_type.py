@@ -1,6 +1,6 @@
 class DiscordRecipientType:
     """
-    Data container for a type of discord recipient, identified by an ID given in Discord
+    Discord recipient types to be used with the Recipient classs
     """
     TYPE_USER = 'user'
     TYPE_CHANNEL = 'channel'

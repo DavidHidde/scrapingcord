@@ -5,6 +5,8 @@ from typing import Union
 
 from aiohttp import ClientSession
 
+from scrapingcord import PingScraper
+
 
 def rate_limit(api_call_func):
     """
@@ -111,7 +113,7 @@ class DiscordHttpClient:
         if self.__session is None:
             headers = {
                 'Authorization': 'Bot ' + self.__token,
-                'User-Agent': 'ScraPingCord (https://github.com/DavidHidde/scrapingcord, 1.0)'
+                'User-Agent': f"ScraPingCord (https://github.com/DavidHidde/scrapingcord, {PingScraper.VERSION})"
             }
             self.__session = ClientSession(headers=headers)
 

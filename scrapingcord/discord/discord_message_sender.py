@@ -3,8 +3,7 @@ from typing import Optional
 
 from scrapingcord.discord.discord_recipient_type import DiscordRecipientType
 from scrapingcord.discord.discord_http_client import DiscordHttpClient
-from scrapingcord.utils.message_sender import MessageSender
-from scrapingcord.utils import Recipient
+from scrapingcord.utils import MessageSender, Recipient
 
 
 class DiscordMessageSender(MessageSender, ABC):

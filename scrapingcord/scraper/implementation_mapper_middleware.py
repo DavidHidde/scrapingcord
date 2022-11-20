@@ -3,7 +3,8 @@ from typing import Union, Generator
 from scrapy import Request
 from scrapy.http import Response
 
-from scrapingcord.scraper import TemplateSpider, TemplateItem
+from scrapingcord.scraper.template_spider import TemplateSpider
+from scrapingcord.scraper.template_item import TemplateItem
 from scrapingcord.utils import ScrapingImplementation
 
 

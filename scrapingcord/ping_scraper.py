@@ -1,5 +1,5 @@
 import asyncio
-from typing import Optional, Callable, Iterable, Union
+from typing import Optional, Callable, Iterable, Union, Generator
 
 from scrapy import Request
 from scrapy.crawler import CrawlerProcess
@@ -13,7 +13,7 @@ class PingScraper:
     """
     Main class that handles setting up the scraper and manages implementations
     """
-    __mapping: dict = {}
+    VERSION = '1.0'
 
     SCRAPER_SETTINGS = {
         'BOT_NAME': 'scrapingcord',
@@ -29,6 +29,8 @@ class PingScraper:
         'TWISTED_REACTOR': 'twisted.internet.asyncioreactor.AsyncioSelectorReactor',
         'REQUEST_FINGERPRINTER_IMPLEMENTATION': '2.7'
     }
+
+    __mapping: dict = {}
 
     def register_implementation(self, implementation: ScrapingImplementation):
         """
@@ -54,12 +56,18 @@ class PingScraper:
         self.__mapping[key][ScrapingImplementation.KEY_URLS] = urls
         return self
 
-    def register_parser(self, key: str, parser_func: Callable[[Response], Union[Iterable[Request], dict]]):
+    def register_parser(
+            self,
+            key: str,
+            parser_func: Callable[[Response], Generator[Union[Request, dict], Union[Request, dict], None]]
+    ):
         """
         Add/replace parser function of an implementation
 
         :param key: The id of the implementation
-        :param parser_func: Function used for parsing Scrapy responses. Should follow https://docs.scrapy.org/en/latest/topics/spiders.html#scrapy.Spider.parse but return a dict for the final result
+        :param parser_func: Function used for parsing Scrapy responses.
+            Should follow https://docs.scrapy.org/en/latest/topics/spiders.html#scrapy.Spider.parse but return a
+            generator of Requests/dicts. Requests will automatically bind the callback if it's not set.
         :return: This instance
         """
         if self.__mapping.get(key) is None:
