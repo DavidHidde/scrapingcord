@@ -1,0 +1,2 @@
+scrapy >= 2.7
+aiohttp >= 3.8.3
